@@ -8,12 +8,12 @@ def minDistance(distances, spt):
     # Tamanho do grafo é inferido
     size = len(distances)
     # Distância mínima
-    min = -inf
+    valueMin = inf
 
     # Realiza a busca pelo mínimo
     for i in range(size):
-        if distances[i] < min and not spt[i]:
-            min = distances[i]
+        if distances[i] < valueMin and not spt[i]:
+            valueMin = distances[i]
             indexMin = i
 
     return indexMin
@@ -29,6 +29,8 @@ def dijkstra(graph : Graph, source : int):
     distances[source] = 0
     # Árvore dos caminhos mínimos (Shortest Path Tree)
     spt = [False] * size
+    # Caminho percorrido, incrementado na mesma ordem que a SPT
+    path = list()
 
     # O Algoritmo de Dijkstra realiza um passo para cada vértice
     # presente no grafo
@@ -39,6 +41,7 @@ def dijkstra(graph : Graph, source : int):
 
         # Incluindo-o na SPT
         spt[closest] = True
+        path.append(closest)
 
         # Atualizando as distâncias para todos os
         # vértices adjacentes ao vértice escolhido na
@@ -51,7 +54,7 @@ def dijkstra(graph : Graph, source : int):
         for i in range(size):
             # Extrai o índice de todos os vértices adjacentes
             # Verifica se i está presente na lista
-            adjs = zip(*adjList)[0]
+            adjs = (list(zip(*adjList)))[0]
             isAdj = i in adjs
             # Se é adjacente, extrair a distância
             if isAdj:
@@ -66,6 +69,7 @@ def dijkstra(graph : Graph, source : int):
             # Realizando a condicional comentada anteriormente
             if isAdj and not spt[i] and smallerDist:
                 distances[i] = newDist
+    return path
 
 # Testando
 if __name__ == '__main__':
@@ -82,4 +86,4 @@ if __name__ == '__main__':
         (4, 5, 2)
     ]
     graph = Graph(connections, 6)
-    n = dijkstra(graph)
+    n = dijkstra(graph, 0)
