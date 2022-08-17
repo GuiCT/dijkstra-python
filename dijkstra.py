@@ -4,7 +4,7 @@ from math import inf
 # Função que encontra vértice com menor distância
 # a partir do conjunto de vértices ainda não incluídos
 # na Árvore dos caminhos mínimos 
-def minDistance(distances, spt):
+def minDistance(distances, path):
     # Tamanho do grafo é inferido
     size = len(distances)
     # Distância mínima
@@ -12,7 +12,7 @@ def minDistance(distances, spt):
 
     # Realiza a busca pelo mínimo
     for i in range(size):
-        if distances[i] < valueMin and not spt[i]:
+        if distances[i] < valueMin and (i not in path):
             valueMin = distances[i]
             indexMin = i
 
@@ -27,9 +27,7 @@ def dijkstra(graph : Graph, source : int):
     # Inicializando distâncias, distância da raiz para si mesma é 0
     distances = [inf] * size
     distances[source] = 0
-    # Árvore dos caminhos mínimos (Shortest Path Tree)
-    spt = [False] * size
-    # Caminho percorrido, incrementado na mesma ordem que a SPT
+    # Caminho percorrido pelo algoritmo
     path = list()
 
     # O Algoritmo de Dijkstra realiza um passo para cada vértice
@@ -37,10 +35,9 @@ def dijkstra(graph : Graph, source : int):
     for _ in range(size):
         # Índice do vértice mais próximo dentre os
         # vértices ainda não visitados.
-        closest = minDistance(distances, spt)
+        closest = minDistance(distances, path)
 
-        # Incluindo-o na SPT
-        spt[closest] = True
+        # Incluindo-o no percurso
         path.append(closest)
 
         # Atualizando as distâncias para todos os
@@ -62,13 +59,16 @@ def dijkstra(graph : Graph, source : int):
             # Caso contrário, próxima iteração
             else:
                 continue
+            # Verifica se i já está presente no percurso
+            inPath = i in path
             # Nova distância
             newDist = distances[closest] + dist_i
             # Verifica se a distância nova é menor (ou igual) a atual
             smallerDist = distances[i] > newDist
             # Realizando a condicional comentada anteriormente
-            if isAdj and not spt[i] and smallerDist:
+            if isAdj and not inPath and smallerDist:
                 distances[i] = newDist
+    # Retornando o percurso calculado
     return path
 
 # Testando
