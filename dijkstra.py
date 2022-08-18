@@ -1,10 +1,11 @@
+from io import TextIOWrapper
 from graph import Graph
 from math import inf
 
 # Função que encontra vértice com menor distância
 # a partir do conjunto de vértices ainda não incluídos
 # na Árvore dos caminhos mínimos 
-def minDistance(distances, path):
+def minDistance(distances : list, path : list) -> int:
     # Tamanho do grafo é inferido
     size = len(distances)
     # Distância mínima
@@ -77,38 +78,71 @@ def dijkstra(graph : Graph, source : int):
     # do vértice de origem para cada um dos vértices no grafo
     return path, distances, predecessors
 
-# Testando
-if __name__ == '__main__':
-    connections = [
-        (0, 1, 2),
-        (0, 3, 1),
-        (0, 2, 5),
-        (1, 2, 3),
-        (1, 3, 2),
-        (2, 3, 3),
-        (2, 4, 1),
-        (2, 5, 5),
-        (3, 4, 1),
-        (4, 5, 2)
-    ]
-    graph = Graph(connections, 6)
-    path, distances, predecessors = dijkstra(graph, 0)
-    print('Caminho ideal calculado pelo algoritmo de Dijkstra: ' + str(path))
-    print('Distância do vértice de origem (0) para cada vértice:')
+# Função para ler os vértices de um arquivo texto
+def readFromFile(file : TextIOWrapper) -> Graph:
+    # Cada linha deve ter o formato O,D,P
+    # Onde:
+    # O é a origem
+    # D é o destino
+    # P é o peso
+    lines = file.readlines()
+    connections = list()
+    # Vértice com maior número determina o tamanho do grafo
+    maximum = 0
+    for l in lines:
+        # Removendo todos espaços e quebra de linha
+        l = l.replace(' ', '')
+        l = l.replace('\n', '')
+        # Lendo as informações
+        source, destination, value = l.split(',')
+        connections.append((int(source), int(destination), int(value)))
+        # Atualizando máximo
+        newMax = max(int(source), int(destination))
+        if newMax > maximum:
+            maximum = newMax
+    # Tamanho do grafo é 1 a mais que o vértice de maior valor
+    size = maximum + 1
+    # Gerando e retornando grafo
+    return Graph(connections, size)
+
+# Função auxiliar que transforma lista
+# em string com setas como delimitadores
+def printList(lst : list) -> str:
+    list_str = str(lst)
+    # Removendo colchetes
+    list_str = list_str.replace("[", "")
+    list_str = list_str.replace("]", "")
+    # Transformando vírgulas em setas
+    list_str = list_str.replace(",", " ->")
+    return list_str
+
+# Função auxiliar para mostrar as informações
+def printInfo(source : int, path : list, distances : list, predecessors : dict):
+    print(f'Caminho ideal calculado pelo Algoritmo de Dijkstra: {printList(path)}')
+    print(f'Distância e caminho a partir da origem ({source}) até cada vértice:')
     for i, dist in enumerate(distances):
-        predecessor_i = predecessors.get(i, None)
-        if predecessor_i is None:
-            print(f'0: {dist}')
-            continue
+        # Formando caminho até a origem a partir dos predecessores
         path_i = [i]
-        predecessor_i = i
-        while True:
-            predecessor_i = predecessors[predecessor_i]
+        predecessor_i = predecessors.get(i, None)
+        # Caso não seja origem (sem predecessor)
+        if predecessor_i is not None:
             path_i.append(predecessor_i)
-            if predecessor_i == 0:
-                break
+            while predecessor_i != 0:
+                predecessor_i = predecessors[predecessor_i]
+                path_i.append(predecessor_i)
+        # Invertendo caminho para partir da origem
         path_i.reverse()
-        size_path_i = len(path_i)
-        for i in range(size_path_i-1):
-            print(f'{path_i[i]} -> ', end='')
-        print(f'{path_i[-1]}: {dist}')
+        print(f'{printList(path_i)}: {dist}')
+
+# Função main, executada quando o arquivo é aberto como script
+if __name__ == '__main__':
+    try:
+        filename = input('Digite um arquivo contendo o grafo: ')
+        with open(filename, 'r') as f:
+            graph = readFromFile(f)
+        source = input('Digite o número do vértice de origem: ')
+        source = int(source)
+        path, distances, predecessors = dijkstra(graph, source)
+        printInfo(source, path, distances, predecessors)
+    except FileNotFoundError:
+        print('O arquivo digitado não existe, favor indicar um arquivo válido.')
