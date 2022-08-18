@@ -9,7 +9,7 @@ class Graph:
         self.adj_list = list()
         for _ in range(n):
             self.adj_list.append(dict())
- 
+
         # Incluindo arestas para formar os grafos com peso
         for (first, second, value) in connections:
             # Para o grafo 1, adicionar destino (2) e peso
