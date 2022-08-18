@@ -29,6 +29,8 @@ def dijkstra(graph : Graph, source : int):
     distances[source] = 0
     # Caminho percorrido pelo algoritmo
     path = list()
+    # Predecessores
+    predecessors = dict()
 
     # O Algoritmo de Dijkstra realiza um passo para cada vértice
     # presente no grafo
@@ -47,15 +49,15 @@ def dijkstra(graph : Graph, source : int):
         # a atual para um determinado vértice. Se o vértice
         # destino está presente na SPT, o mesmo é ignorado.
         # Lista de adjacência do vértice escolhido:
-        adjList = graph.adj_list[closest]
+        closestDict = graph.adj_list[closest]
         for i in range(size):
             # Extrai o índice de todos os vértices adjacentes
             # Verifica se i está presente na lista
-            adjs = (list(zip(*adjList)))[0]
+            adjs = closestDict.keys()
             isAdj = i in adjs
             # Se é adjacente, extrair a distância
             if isAdj:
-                dist_i = [item[1] for item in adjList if item[0] == i][0]
+                dist_i = closestDict[i]
             # Caso contrário, próxima iteração
             else:
                 continue
@@ -66,10 +68,14 @@ def dijkstra(graph : Graph, source : int):
             # Verifica se a distância nova é menor (ou igual) a atual
             smallerDist = distances[i] > newDist
             # Realizando a condicional comentada anteriormente
+            # Atualizando predecessor de i
             if isAdj and not inPath and smallerDist:
                 distances[i] = newDist
-    # Retornando o percurso calculado
-    return path
+                predecessors[i] = closest
+
+    # Retornando o percurso calculado, assim como a distância
+    # do vértice de origem para cada um dos vértices no grafo
+    return path, distances, predecessors
 
 # Testando
 if __name__ == '__main__':
@@ -86,4 +92,23 @@ if __name__ == '__main__':
         (4, 5, 2)
     ]
     graph = Graph(connections, 6)
-    n = dijkstra(graph, 0)
+    path, distances, predecessors = dijkstra(graph, 0)
+    print('Caminho ideal calculado pelo algoritmo de Dijkstra: ' + str(path))
+    print('Distância do vértice de origem (0) para cada vértice:')
+    for i, dist in enumerate(distances):
+        predecessor_i = predecessors.get(i, None)
+        if predecessor_i is None:
+            print(f'0: {dist}')
+            continue
+        path_i = [i]
+        predecessor_i = i
+        while True:
+            predecessor_i = predecessors[predecessor_i]
+            path_i.append(predecessor_i)
+            if predecessor_i == 0:
+                break
+        path_i.reverse()
+        size_path_i = len(path_i)
+        for i in range(size_path_i-1):
+            print(f'{path_i[i]} -> ', end='')
+        print(f'{path_i[-1]}: {dist}')
