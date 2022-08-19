@@ -1,4 +1,4 @@
-# Dijsktra in Python
+# Dijkstra in Python
 
 Algoritmo de Dijkstra implementado na Linguagem Python, utilizando grafos não direcionados.
 
@@ -15,6 +15,6 @@ O arquivo exemplo.txt mostra como deve ser realizado o input para a execução d
 # Output
 
 O algoritmo executado retornará:
-- Caminho ideal encontado pelo Algoritmo de Dijsktra
+- Caminho ideal encontado pelo Algoritmo de Dijkstra
 - Caminho ideal para cada vértice a partir da origem escolhida
 - Distância da origem para cada vértice utilizando os caminhos escolhidos
